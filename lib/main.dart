@@ -1,12 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import './screens/tabs_screen.dart';
 import './screens/results_screen.dart';
 import './screens/details_screen.dart';
 import './screens/filters_screen.dart';
+import './screens/categories_screen.dart';
+import './screens/ai_planner_screen.dart';
+import './screens/ai_chat_screen.dart';
+import './screens/ai_image_screen.dart';
 import './models/trip.dart';
+import './providers/theme_provider.dart';
+import './services/ai_service.dart';
 
 void main() {
-  runApp(const MyApp());
+  AIService().init();
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => ThemeProvider(),
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -70,48 +84,92 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
     return MaterialApp(
       title: 'Trip App',
+      debugShowCheckedModeBanner:
+          false, // Removes the debug banner for a cleaner look
+      themeMode: themeProvider.themeMode,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF00897B), // Teal 600
-          secondary: const Color(0xFFFF6F00), // Amber 900
-          surface: Colors.white,
-          // background is deprecated in some versions but handled by colorScheme
-        ),
-        scaffoldBackgroundColor: const Color(0xFFF8F9FA), // Light grey-white
-        fontFamily: 'Raleway',
-        textTheme: ThemeData.light().textTheme.copyWith(
-          bodyLarge: const TextStyle(color: Color.fromRGBO(20, 51, 51, 1)),
-          bodyMedium: const TextStyle(color: Color.fromRGBO(20, 51, 51, 1)),
-          titleLarge: const TextStyle(
-            fontSize: 20,
-            fontFamily: 'RobotoCondensed',
-            fontWeight: FontWeight.bold,
-          ),
-        ),
         useMaterial3: true,
-        appBarTheme: const AppBarTheme(
+
+        // 1. Refined Color Scheme
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF006D77), // Deep Ocean Teal
+          primary: const Color(0xFF006D77),
+          secondary: const Color(0xFFE29578), // Soft Coral/Salmon
+          surface: Colors.white,
+          onSurface: const Color(0xFF2B2D42),
+          brightness: Brightness.light,
+        ),
+
+        // 2. Global Scaffold Style
+        scaffoldBackgroundColor: const Color(
+          0xFFF1F5F9,
+        ), // Very light cool grey
+        // 3. Typography (Using Google Fonts for a premium feel)
+        textTheme: GoogleFonts.montserratTextTheme(ThemeData.light().textTheme)
+            .copyWith(
+              displayLarge: GoogleFonts.playfairDisplay(
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF2B2D42),
+              ),
+              titleLarge: GoogleFonts.montserrat(
+                fontWeight: FontWeight.w700,
+                fontSize: 20,
+                letterSpacing: 0.5,
+              ),
+              bodyMedium: GoogleFonts.inter(
+                color: const Color(0xFF4A4E69),
+                fontSize: 16,
+              ),
+            ),
+
+        // 4. Enhanced AppBar Design
+        appBarTheme: AppBarTheme(
           centerTitle: true,
           elevation: 0,
-          backgroundColor: Colors.transparent, // For transparent feel if needed
-          titleTextStyle: TextStyle(
-            fontFamily: 'Raleway',
-            fontSize: 24,
+          scrolledUnderElevation: 2, // Slight shadow when content scrolls under
+          backgroundColor: const Color(0xFFF1F5F9),
+          foregroundColor: const Color(0xFF006D77),
+          titleTextStyle: GoogleFonts.montserrat(
+            fontSize: 22,
             fontWeight: FontWeight.w800,
-            color: Color(0xFF00695C), // Dark Teal
+            color: const Color(0xFF006D77),
           ),
-          iconTheme: IconThemeData(color: Color(0xFF00695C)),
         ),
+
+        // 5. Modern Card & Button Styling
         cardTheme: CardThemeData(
-          elevation: 4,
-          shadowColor: Colors.black26,
+          elevation: 2,
+          clipBehavior: Clip.antiAlias,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(
+              24,
+            ), // Extra rounded for modern look
+          ),
+          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        ),
+
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            elevation: 0,
           ),
         ),
       ),
-      // home: CategoriesScreen(), // We use routes now
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF006D77),
+          brightness: Brightness.dark,
+        ),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        textTheme: GoogleFonts.montserratTextTheme(ThemeData.dark().textTheme),
+      ),
       initialRoute: '/',
       routes: {
         '/': (ctx) => TabsScreen(favoriteTrips: _favoriteTrips),
@@ -123,6 +181,10 @@ class _MyAppState extends State<MyApp> {
         ),
         FiltersScreen.routeName: (ctx) =>
             FiltersScreen(currentFilters: _filters, saveFilters: _setFilters),
+        CategoriesScreen.routeName: (ctx) => const CategoriesScreen(),
+        AiPlannerScreen.routeName: (ctx) => const AiPlannerScreen(),
+        AIChatScreen.routeName: (ctx) => const AIChatScreen(),
+        AIImageScreen.routeName: (ctx) => const AIImageScreen(),
       },
     );
   }
