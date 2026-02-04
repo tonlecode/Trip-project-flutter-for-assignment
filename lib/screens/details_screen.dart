@@ -58,7 +58,18 @@ class DetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tripId = ModalRoute.of(context)!.settings.arguments as String;
+    final args = ModalRoute.of(context)!.settings.arguments;
+    final String tripId;
+    final String heroTag;
+
+    if (args is Map<String, dynamic>) {
+      tripId = args['id'];
+      heroTag = args['tag'];
+    } else {
+      tripId = args as String;
+      heroTag = tripId;
+    }
+
     final trip = dummyTrips.firstWhere((trip) => trip.id == tripId);
     final favoriteStatus = isFavorite(tripId);
 
@@ -86,7 +97,7 @@ class DetailsScreen extends StatelessWidget {
                 ),
               ),
               background: Hero(
-                tag: trip.id,
+                tag: heroTag,
                 child: Stack(
                   fit: StackFit.expand,
                   children: [

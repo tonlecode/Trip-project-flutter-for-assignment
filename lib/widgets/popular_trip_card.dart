@@ -10,11 +10,12 @@ class PopularTripCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
+    final heroTag = 'popular_${trip.id}';
     return InkWell(
       onTap: () {
         Navigator.of(context).pushNamed(
           DetailsScreen.routeName,
-          arguments: trip.id,
+          arguments: {'id': trip.id, 'tag': heroTag},
         );
       },
       borderRadius: BorderRadius.circular(16),
@@ -35,11 +36,14 @@ class PopularTripCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Stack(
             children: [
-              Image.asset(
-                trip.imageUrl,
-                height: double.infinity,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              Hero(
+                tag: heroTag,
+                child: Image.asset(
+                  trip.imageUrl,
+                  height: double.infinity,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
               Positioned.fill(
                 child: DecoratedBox(
