@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/trip.dart';
+import '../widgets/booking_sheet.dart';
 
 class DetailsScreen extends StatelessWidget {
   static const routeName = '/trip-detail';
@@ -382,25 +382,89 @@ class DetailsScreen extends StatelessWidget {
           ),
         ],
       ),
-      // 5. Stylized Floating Action Button
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => toggleFavorite(tripId),
-        backgroundColor: favoriteStatus
-            ? Colors.pink
-            : Theme.of(context).colorScheme.primary,
-        icon: Icon(
-          favoriteStatus ? Icons.favorite : Icons.favorite_border,
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
           color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.05),
+              blurRadius: 10,
+              offset: const Offset(0, -5),
+            ),
+          ],
         ),
-        label: Text(
-          favoriteStatus ? 'In Favorites' : 'Add to Favorites',
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
+        child: SafeArea(
+          child: Row(
+            children: [
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Price',
+                    style: GoogleFonts.inter(color: Colors.grey, fontSize: 14),
+                  ),
+                  Text(
+                    '\$${trip.price}',
+                    style: GoogleFonts.playfairDisplay(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              // Favorite Button
+              Container(
+                decoration: BoxDecoration(
+                  color: favoriteStatus
+                      ? Colors.pink.withValues(alpha: 0.1)
+                      : Colors.grey.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: IconButton(
+                  icon: Icon(
+                    favoriteStatus ? Icons.favorite : Icons.favorite_border,
+                    color: favoriteStatus ? Colors.pink : Colors.grey,
+                  ),
+                  onPressed: () => toggleFavorite(tripId),
+                ),
+              ),
+              const SizedBox(width: 16),
+              // Book Button
+              Expanded(
+                child: SizedBox(
+                  height: 50,
+                  child: FilledButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        builder: (ctx) => BookingSheet(trip: trip),
+                      );
+                    },
+                    style: FilledButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    child: const Text(
+                      'Book Now',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }

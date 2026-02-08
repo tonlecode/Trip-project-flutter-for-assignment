@@ -84,14 +84,6 @@ class _TabsScreenState extends State<TabsScreen> with SingleTickerProviderStateM
       // 1. Transparent AppBar that blends with the scaffold background
       appBar: AppBar(
         title: Text(pages[_selectedPageIndex]['title']),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              showSearch(context: context, delegate: TripSearchDelegate());
-            },
-          ),
-        ],
       ),
       // 2. Animated Switcher for smooth fading between tabs
       body: AnimatedSwitcher(
